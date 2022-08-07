@@ -26,13 +26,16 @@
   ],
   "scripts": {
     "build": "tsc -p ./tsconfig.build.json",
-    "check": "tsc -p ./tsconfig.json",
+    "check": "tsc -p ./tsconfig.check.json",
     "lint": "eslint --max-warnings=0 .",
     "format": "prettier --check .",
     "check-lint-format": "pnpm check && pnpm lint && pnpm format",
     "test": "pnpm check-lint-format && pnpm vitest run",
     "prepare": "npx simple-git-hooks",
     "release": "semantic-release --branches main"
+  },
+  "dependencies": {
+    "immer": "^9.0.15"
   },
   "devDependencies": {
     "@skarab/eslint-config": "^1.1.0",
