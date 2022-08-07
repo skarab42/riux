@@ -41,3 +41,70 @@ it('should create an immutable store without freezing the initial store', () => 
   expect(store.current()).toStrictEqual({ life: 42 });
   expectType(store.current()).identicalTo<{ readonly life: number }>();
 });
+
+it('should update the store', () => {
+  const state = { counter: 0 };
+  const store = createStore(state);
+
+  expect(store.current()).toStrictEqual(state);
+
+  const increment = (): { readonly counter: number } =>
+    store.update((state) => {
+      state.counter++;
+    });
+
+  expect(increment().counter).toBe(1);
+  expect(increment().counter).toBe(2);
+  expect(increment().counter).toBe(3);
+});
+
+it('should subscribe/unsubscribe from store update', () => {
+  const state = { counter: 0 };
+  const store = createStore(state);
+
+  expect(store.current()).toStrictEqual(state);
+
+  let counter = 0;
+
+  const subscription = store.subscribe((state) => {
+    counter = state.counter;
+  });
+
+  const increment = (): { readonly counter: number } =>
+    store.update((state) => {
+      state.counter++;
+    });
+
+  expect(increment().counter).toBe(1);
+  expect(counter).toBe(1);
+
+  subscription.off();
+
+  expect(increment().counter).toBe(2);
+  expect(increment().counter).toBe(3);
+  expect(increment().counter).toBe(4);
+  expect(increment().counter).toBe(5);
+
+  expect(counter).toBe(1);
+
+  subscription.on();
+
+  expect(increment().counter).toBe(6);
+  expect(increment().counter).toBe(7);
+
+  expect(counter).toBe(7);
+
+  subscription.off();
+
+  expect(increment().counter).toBe(8);
+  expect(increment().counter).toBe(9);
+
+  expect(counter).toBe(7);
+
+  subscription.on();
+
+  expect(increment().counter).toBe(10);
+  expect(increment().counter).toBe(11);
+
+  expect(counter).toBe(11);
+});
