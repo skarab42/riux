@@ -61,6 +61,10 @@ export interface Store<TState, TOptions extends Options> {
 
 // ---
 
+export function isObject(value: unknown): value is object {
+  return value !== null && typeof value === 'object';
+}
+
 /**
  * Create and return a new immutable {@link Store} object.
  */
@@ -70,7 +74,7 @@ export function createStore<TState, TOptions extends Options = DefaultOptions>(
 ): Store<TState, TOptions> {
   const { freezeInitialState } = { ...defaultOptions, ...options };
 
-  if (!freezeInitialState) {
+  if (!freezeInitialState && isObject(initialState)) {
     initialState = { ...initialState };
   }
 

@@ -42,11 +42,40 @@ it('should create an immutable store without freezing the initial store', () => 
   expectType(store.current()).identicalTo<{ readonly life: number }>();
 });
 
+it('should create an immutable store from number', () => {
+  const store = createStore(42, { freezeInitialState: false });
+
+  expectType(store.initial()).identicalTo<number>();
+  expectType(store.current()).identicalTo<number>();
+
+  const increment = (): number =>
+    store.update((state) => {
+      return state + 1;
+    });
+
+  expect(store.initial()).toStrictEqual(42);
+  expect(store.current()).toStrictEqual(42);
+
+  expect(increment()).toStrictEqual(43);
+  expect(increment()).toStrictEqual(44);
+
+  expect(store.initial()).toStrictEqual(42);
+  expect(store.current()).toStrictEqual(44);
+});
+
+it('should create an immutable store from number with freezeInitialState disabled', () => {
+  const store = createStore(42, { freezeInitialState: false });
+
+  expectType(store.initial()).identicalTo<number>();
+  expectType(store.current()).identicalTo<number>();
+});
+
 it('should update the store', () => {
   const state = { counter: 0 };
   const store = createStore(state);
 
   expect(store.current()).toStrictEqual(state);
+  expectType(store.current()).identicalTo<{ readonly counter: number }>();
 
   const increment = (): { readonly counter: number } =>
     store.update((state) => {
