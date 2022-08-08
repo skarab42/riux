@@ -1,20 +1,14 @@
-import { type Immutable, produce, Draft } from 'immer';
-import type { Nothing } from 'immer/dist/internal.js';
+import type { Draft, Immutable, Nothing } from 'immer/dist/internal.js';
+import { produce } from 'immer';
 
-// ---
+// ----------------------------------------------------------------------------
 
 export interface Options {
   /** Should freeze the initial state outside of `createStore`? (default: true) */
   freezeInitialState?: boolean;
 }
 
-export const defaultOptions: Required<Options> = {
-  freezeInitialState: true,
-};
-
-export type DefaultOptions = typeof defaultOptions;
-
-// ---
+// ----------------------------------------------------------------------------
 
 export type InitialState<TState, TOptions extends Options> = true extends TOptions['freezeInitialState']
   ? Immutable<TState>
@@ -22,16 +16,7 @@ export type InitialState<TState, TOptions extends Options> = true extends TOptio
 
 export type CurrentState<TState> = Immutable<TState>;
 
-// ---
-
-export type Subscriber<TState> = (state: Immutable<TState>) => void;
-
-export interface Subscription {
-  on: () => Subscription;
-  off: () => boolean;
-}
-
-// ---
+// ----------------------------------------------------------------------------
 
 export type DraftState<TState> = Draft<Immutable<TState>>;
 
@@ -44,35 +29,43 @@ export type RecipeReturn<TState> =
 
 export type Recipe<TState> = (draft: DraftState<TState>) => RecipeReturn<TState>;
 
-// ---
+// ----------------------------------------------------------------------------
 
-export interface Store<TState, TOptions extends Options> {
+export type Subscriber<TState> = (state: Immutable<TState>) => void;
+
+export interface Subscription {
+  on: () => Subscription;
+  off: () => boolean;
+}
+
+// ----------------------------------------------------------------------------
+
+export interface Store<TState, TOptions> {
   /** Return the initial state (maybe immutable). */
   initial(): InitialState<TState, TOptions>;
   /** Return the current state (immutable). */
   current(): CurrentState<TState>;
+  /** Update and return a new immutable state. */
+  update(recipe: Recipe<TState>): CurrentState<TState>;
   /** Subscribe to store update event. */
   subscribe(subscriber: Subscriber<TState>): Subscription;
   /** Unsubscribe from store update event. */
   unsubscribe(subscriber: Subscriber<TState>): boolean;
-  /** Update and return a new immutable state. */
-  update(recipe: Recipe<TState>): CurrentState<TState>;
 }
 
-// ---
+// ----------------------------------------------------------------------------
 
 export function isObject(value: unknown): value is object {
   return value !== null && typeof value === 'object';
 }
 
-/**
- * Create and return a new immutable {@link Store} object.
- */
-export function createStore<TState, TOptions extends Options = DefaultOptions>(
+// ----------------------------------------------------------------------------
+
+export function createStore<TState, TOptions extends Options>(
   initialState: InitialState<TState, TOptions>,
   options?: TOptions,
 ): Store<TState, TOptions> {
-  const { freezeInitialState } = { ...defaultOptions, ...options };
+  const { freezeInitialState } = { freezeInitialState: true, ...options };
 
   if (!freezeInitialState && isObject(initialState)) {
     initialState = { ...initialState };
