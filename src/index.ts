@@ -56,11 +56,11 @@ export interface Options<TState, TFreezeInitialState extends boolean, TMutations
   actions?: TActions & Actions<TState, TMutations>;
 }
 
-export interface Store<TState, TFreezeInitialState, TMutations, TActions> {
-  /** Return the initial state. Can be immutable depending on the {@link Options.freezeInitialState|freezeInitialState} option. */
-  initial(): InitialState<TState, TFreezeInitialState>;
+export interface Store<TState, TMutations, TActions> {
+  /** Return the initial state. */
+  initial(): Immutable<TState>;
 
-  /** Return the current state (always immutable). */
+  /** Return the current state. */
   current(): Immutable<TState>;
 
   /**
@@ -124,7 +124,7 @@ export function isObject(value: unknown): value is object {
 export function createStore<TState, TFreezeInitialState extends boolean, TMutations, TActions>(
   initialState: InitialState<TState, TFreezeInitialState>,
   options?: Options<TState, TFreezeInitialState, TMutations, TActions>,
-): Store<TState, TFreezeInitialState, TMutations, TActions> {
+): Store<TState, TMutations, TActions> {
   const { freezeInitialState, mutations, actions } = { freezeInitialState: true, ...options };
 
   if (!freezeInitialState && isObject(initialState)) {
@@ -155,9 +155,9 @@ export function createStore<TState, TFreezeInitialState extends boolean, TMutati
     return currentState;
   };
 
-  const store: Store<TState, TFreezeInitialState, TMutations, TActions> = {
+  const store: Store<TState, TMutations, TActions> = {
     initial() {
-      return initialState;
+      return initialState as Immutable<TState>;
     },
     current() {
       return currentState;
