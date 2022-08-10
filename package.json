@@ -1,7 +1,7 @@
 {
   "name": "@skarab/store",
   "version": "0.0.0-development",
-  "description": "Scaffolded with @skarab/skaffold",
+  "description": "📦 Fully typed and immutable store made on top of Immer with mutation, action, subscription and more!",
   "author": {
     "name": "skarab42",
     "email": "skarab@bluewin.ch"
@@ -56,5 +56,12 @@
     "pnpm": ">=7"
   },
   "packageManager": "pnpm@7.6.0",
-  "keywords": []
+  "keywords": [
+    "immutable",
+    "store",
+    "state",
+    "immer",
+    "redux",
+    "typed"
+  ]
 }
