@@ -1,23 +1,6 @@
 import type { Draft, Immutable, Nothing } from 'immer/dist/internal.js';
 import { produce } from 'immer';
 
-// ----------------------------------------------------------------------------
-
-export interface Options {
-  /** Should freeze the initial state outside of `createStore`? (default: true) */
-  freezeInitialState?: boolean;
-}
-
-// ----------------------------------------------------------------------------
-
-export type InitialState<TState, TOptions extends Options> = true extends TOptions['freezeInitialState']
-  ? Immutable<TState>
-  : TState;
-
-export type CurrentState<TState> = Immutable<TState>;
-
-// ----------------------------------------------------------------------------
-
 export type DraftState<TState> = Draft<Immutable<TState>>;
 
 export type RecipeReturn<TState> =
@@ -29,76 +12,130 @@ export type RecipeReturn<TState> =
 
 export type Recipe<TState> = (draft: DraftState<TState>) => RecipeReturn<TState>;
 
-// ----------------------------------------------------------------------------
+export type InitialState<TState, TImmutable> = true extends TImmutable ? Immutable<TState> : TState;
 
 export type Subscriber<TState> = (state: Immutable<TState>) => void;
 
 export interface Subscription {
-  on: () => Subscription;
-  off: () => boolean;
+  enable: () => Subscription;
+  disable: () => boolean;
 }
 
-// ----------------------------------------------------------------------------
+export type InferRestArguments<TFunction> = TFunction extends (draft: any, ...restArguments: infer TRest) => any
+  ? TRest
+  : [];
 
-export interface Store<TState, TOptions> {
-  /** Return the initial state (maybe immutable). */
-  initial(): InitialState<TState, TOptions>;
-  /** Return the current state (immutable). */
-  current(): CurrentState<TState>;
-  /** Update and return a new immutable state. */
-  update(recipe: Recipe<TState>): CurrentState<TState>;
-  /** Subscribe to store update event. */
+export type MutationFunction<TState, TMutations> = <TName extends keyof TMutations>(
+  name: TName,
+  ...restArguments: InferRestArguments<TMutations[TName]>
+) => Immutable<TState>;
+
+export type Mutation<TState> = (draft: DraftState<TState>, ...restArguments: any[]) => RecipeReturn<TState>;
+
+export type Mutations<TState> = Record<string, Mutation<TState>>;
+
+export type ActionFunction<TState, TActions> = <TName extends keyof TActions>(
+  name: TName,
+  ...restArguments: InferRestArguments<TActions[TName]>
+) => Immutable<TState>;
+
+export type Action<TState, TMutations> = (
+  mutation: MutationFunction<TState, TMutations>,
+  ...restArguments: any[]
+) => // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
+undefined | void;
+
+export type Actions<TState, TMutations> = Record<string, Action<TState, TMutations>>;
+
+export interface Options<TState, TFreezeInitialState extends boolean, TMutations, TActions> {
+  /** Should freeze the initial state? */
+  freezeInitialState?: TFreezeInitialState;
+  /** A record of mutations. */
+  mutations?: TMutations & Mutations<TState>;
+  /** A record of actions. */
+  actions?: TActions & Actions<TState, TMutations>;
+}
+
+export interface Store<TState, TFreezeInitialState, TMutations, TActions> {
+  /** Return the initial state. Can be immutable depending on the {@link Options.freezeInitialState|freezeInitialState} option. */
+  initial(): InitialState<TState, TFreezeInitialState>;
+
+  /** Return the current state (always immutable). */
+  current(): Immutable<TState>;
+
+  /**
+   * Update the state and notify any subscribers.
+   *
+   * @param recipe - An immer [recipe](https://immerjs.github.io/immer/produce).
+   * @returns Current state.
+   */
+  update(recipe: Recipe<TState>): Immutable<TState>;
+
+  /**
+   * Subscribe to state update event.
+   *
+   * @param subscriber - A {@link Subscriber} function which takes the current state as its first argument.
+   * @returns A {@link Subscription} object with enable/disable methods.
+   */
   subscribe(subscriber: Subscriber<TState>): Subscription;
-  /** Unsubscribe from store update event. */
-  unsubscribe(subscriber: Subscriber<TState>): boolean;
-}
 
-// ----------------------------------------------------------------------------
+  /**
+   * Unsubscribe from state update event.
+   *
+   * @param subscriber - A {@link Subscriber} function which takes the current state as its first argument.
+   * @returns true if unsubscribed, false if never/already unsubribed.
+   */
+  unsubscribe(subscriber: Subscriber<TState>): boolean;
+
+  /**
+   * Call a mutation and return the current state.
+   *
+   * @param name - Mutation name.
+   * @param argument - Zero or more argument to pass to the mutation.
+   * @throws If the mutation does not exist.
+   * @returns Current state.
+   */
+  mutation: MutationFunction<TState, TMutations>;
+
+  /**
+   * Call an action and return the current state.
+   *
+   * @param name - Action name.
+   * @param argument - Zero or more argument to pass to the action.
+   * @throws If the action does not exist.
+   * @returns Current state.
+   */
+  action: ActionFunction<TState, TActions>;
+}
 
 export function isObject(value: unknown): value is object {
   return value !== null && typeof value === 'object';
 }
 
-// ----------------------------------------------------------------------------
-
-export function createStore<TState, TOptions extends Options>(
-  initialState: InitialState<TState, TOptions>,
-  options?: TOptions,
-): Store<TState, TOptions> {
-  const { freezeInitialState } = { freezeInitialState: true, ...options };
+/**
+ * Creates a typed and immutable store around the [immer](https://immerjs.github.io/immer/) library.
+ *
+ * Plain objects (objects without a prototype), arrays, Maps and Sets are always drafted by Immer. Every other object must use the [immerable](https://immerjs.github.io/immer/complex-objects) symbol to mark itself as compatible with Immer.
+ *
+ * @param initialState - Any [immerable](https://immerjs.github.io/immer/complex-objects) value.
+ * @param options - Some {@link Options}.
+ * @returns A typed and immutable {@link Store}.
+ */
+export function createStore<TState, TFreezeInitialState extends boolean, TMutations, TActions>(
+  initialState: InitialState<TState, TFreezeInitialState>,
+  options?: Options<TState, TFreezeInitialState, TMutations, TActions>,
+): Store<TState, TFreezeInitialState, TMutations, TActions> {
+  const { freezeInitialState, mutations, actions } = { freezeInitialState: true, ...options };
 
   if (!freezeInitialState && isObject(initialState)) {
     initialState = { ...initialState };
   }
 
-  let currentState = produce(initialState, (draft) => draft) as CurrentState<TState>;
-
-  function initial(): InitialState<TState, TOptions> {
-    return initialState;
-  }
-
-  function current(): CurrentState<TState> {
-    return currentState;
-  }
+  let currentState = produce(initialState, (draft) => draft) as Immutable<TState>;
 
   const subscribers = new Set<Subscriber<TState>>();
 
-  function unsubscribe(subscriber: Subscriber<TState>): boolean {
-    return subscribers.delete(subscriber);
-  }
-
-  function subscribe(subscriber: Subscriber<TState>): Subscription {
-    subscribers.add(subscriber);
-
-    return {
-      on: () => subscribe(subscriber),
-      off: () => unsubscribe(subscriber),
-    };
-  }
-
-  function update(recipe: Recipe<TState>): CurrentState<TState> {
-    currentState = produce(currentState, recipe);
-
+  function notify(): Immutable<TState> {
     for (const subscriber of subscribers) {
       subscriber(currentState);
     }
@@ -106,5 +143,60 @@ export function createStore<TState, TOptions extends Options>(
     return currentState;
   }
 
-  return { initial, current, subscribe, unsubscribe, update };
+  const mutation: MutationFunction<TState, TMutations> = (name, ...restArguments) => {
+    const mutation = mutations?.[name];
+
+    if (!mutation) {
+      throw new Error(`Undefined mutation: ${String(name)}`);
+    }
+
+    currentState = produce(currentState, (draft) => mutation(draft, ...restArguments));
+
+    return currentState;
+  };
+
+  const store: Store<TState, TFreezeInitialState, TMutations, TActions> = {
+    initial() {
+      return initialState;
+    },
+    current() {
+      return currentState;
+    },
+    update(recipe) {
+      currentState = produce(currentState, recipe);
+
+      return notify();
+    },
+    unsubscribe(subscriber) {
+      return subscribers.delete(subscriber);
+    },
+    subscribe(subscriber) {
+      subscribers.add(subscriber);
+
+      return {
+        enable: () => this.subscribe(subscriber),
+        disable: () => this.unsubscribe(subscriber),
+      };
+    },
+    mutation(name, ...restArguments) {
+      mutation(name, ...restArguments);
+
+      return notify();
+    },
+    action(name, ...restArguments) {
+      const action = actions?.[name];
+
+      if (!action) {
+        throw new Error(`Undefined action: ${String(name)}`);
+      }
+
+      action(mutation, ...restArguments);
+
+      return notify();
+    },
+  };
+
+  return store;
 }
+
+export const store = createStore;
