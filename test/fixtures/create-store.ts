@@ -1,4 +1,5 @@
 import { createStore } from '../../src/index.js';
+import { parseStringOrNumber } from './util.js';
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 export function createStoreWithActions() {
@@ -34,6 +35,31 @@ export function createStoreWithMutations() {
       },
       add(draft, value: number): number {
         return draft + value;
+      },
+    },
+  });
+}
+
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+export function createStoreWithValidation() {
+  return createStore(0, {
+    parse: parseStringOrNumber,
+    mutations: {
+      increment(draft) {
+        return Number(draft) + 1;
+      },
+      add(draft, value: string | number) {
+        return Number(draft) + Number(value);
+      },
+      set(_draft, value: string | number) {
+        return value;
+      },
+    },
+    actions: {
+      addArray(mutation, values: unknown[]): void {
+        for (const value of values) {
+          mutation('add', value as string); // <- deliberate error
+        }
       },
     },
   });
