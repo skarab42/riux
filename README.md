@@ -112,6 +112,8 @@ store.action('addArray', [5, 8, 10, 15]); // 42
 // 'console.log' is called 4 times!
 ```
 
+> If an error is raised in an action, it will not be finalised and the state will remain unchanged, even if any mutations have been successfully completed.
+
 Incredible, but I think I've seen this before! You talk about immutability at the beginning, and you haven't even mentioned it yet... say more!
 
 ### Immutability
@@ -148,7 +150,47 @@ Ok that rocks, one source of truth I like that! But I want more!
 
 ### Validation
 
-WIP...
+By default no data validation is done at runtime, only TypeScript protects you from input type errors at build time or in the IDE.
+
+If you want to validate your data at runtime, you must provide a `parse` function that validates/casts the state before finalizing the draft and either returns a strongly typed value (if valid) or throws an error (if invalid).
+
+```ts
+const store = createStore(0, {
+  parse: (state) => {
+    if (typeof state === 'number') return state;
+    throw new Error(`expected 'number' got '${typeof state}'`);
+  },
+  mutations: {
+    add(draft, value: number) {
+      return draft + value;
+    },
+  },
+});
+
+store.mutation('add', 'prout'); // TS ERROR + RUNTIME ERROR: expected 'number' got 'string'
+```
+
+Another advantage of this method is the ability to specify multiple types (union). Imagine you have a single value that can be undefined or a string. How do you do this?
+
+```ts
+const store = createStore(undefined, {
+  parse: (state) => {
+    if (state === undefined || typeof state === 'string') return state;
+    throw new Error(`expected 'number' got '${typeof state}'`);
+  },
+  mutations: {
+    set(_draft, value: string | undefined) {
+      return value;
+    },
+  },
+});
+
+store.current(); // string | undefined
+
+store.mutation('set', undefined);
+store.mutation('set', 'or string');
+store.mutation('set', 42); // TS ERROR + RUNTIME ERROR: expected 'string' got 'number'
+```
 
 ### Get initial and current state
 
@@ -161,14 +203,6 @@ store.mutation('increment'); // 1
 
 store.initial(); // 42
 store.current(); // 1
-```
-
-### Fully typed at all levels!
-
-```ts
-store.mutation('add'); // Expected 2 arguments, but got 1.
-store.mutation('add', 'life'); // Argument of type 'string' is not assignable to parameter of type 'number'.
-store.mutation('prout'); // Argument of type '"prout"' is not assignable to parameter of type '"add" | "increment" | "reset"'.
 ```
 
 ---
