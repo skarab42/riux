@@ -30,6 +30,12 @@ export type MutationFunction<TState, TMutations> = <TName extends keyof TMutatio
   ...restArguments: InferRestArguments<TMutations[TName]>
 ) => Immutable<TState>;
 
+export type InternalMutationFunction<TState, TMutations> = <TName extends keyof TMutations>(
+  state: TState | Immutable<TState>,
+  name: TName,
+  ...restArguments: InferRestArguments<TMutations[TName]>
+) => Immutable<TState>;
+
 export type Mutation<TState> = (draft: DraftState<TState>, ...restArguments: any[]) => RecipeReturn<TState>;
 
 export type Mutations<TState> = Record<string, Mutation<TState>>;
@@ -50,6 +56,8 @@ export type Actions<TState, TMutations> = Record<string, Action<TState, TMutatio
 export interface Options<TState, TFreezeInitialState extends boolean, TMutations, TActions> {
   /** Should freeze the initial state? */
   freezeInitialState?: TFreezeInitialState;
+  /** Should be a function that validates/casts the state before finalizing the draft and either returns a strongly typed value (if valid) or throws an error (if invalid). */
+  parse?: (state: unknown) => TState;
   /** A record of mutations. */
   mutations?: TMutations & Mutations<TState>;
   /** A record of actions. */
@@ -125,13 +133,27 @@ export function createStore<TState, TFreezeInitialState extends boolean, TMutati
   initialState: InitialState<TState, TFreezeInitialState>,
   options?: Options<TState, TFreezeInitialState, TMutations, TActions>,
 ): Store<TState, TMutations, TActions> {
-  const { freezeInitialState, mutations, actions } = { freezeInitialState: true, ...options };
+  const { freezeInitialState, mutations, actions, parse } = { freezeInitialState: true, ...options };
+
+  if (parse && typeof parse !== 'function') {
+    throw new Error(`'options.parse' should be a function got '${typeof parse}'`);
+  }
 
   if (!freezeInitialState && isObject(initialState)) {
     initialState = { ...initialState };
   }
 
-  let currentState = produce(initialState, (draft) => draft) as Immutable<TState>;
+  function produceAndParse(state: TState | Immutable<TState>, recipe: Recipe<TState>): Immutable<TState> {
+    return produce(state as Immutable<TState>, (draft) => {
+      if (!parse) {
+        return recipe(draft);
+      }
+
+      return parse(recipe(draft)) as RecipeReturn<TState>;
+    });
+  }
+
+  let currentState = produceAndParse(initialState, (draft) => draft);
 
   const subscribers = new Set<Subscriber<TState>>();
 
@@ -143,16 +165,18 @@ export function createStore<TState, TFreezeInitialState extends boolean, TMutati
     return currentState;
   }
 
-  const mutation: MutationFunction<TState, TMutations> = (name, ...restArguments) => {
+  const mutation: InternalMutationFunction<TState, TMutations> = (
+    state: TState | Immutable<TState>,
+    name,
+    ...restArguments
+  ) => {
     const mutation = mutations?.[name];
 
     if (!mutation) {
       throw new Error(`Undefined mutation: ${String(name)}`);
     }
 
-    currentState = produce(currentState, (draft) => mutation(draft, ...restArguments));
-
-    return currentState;
+    return produceAndParse(state, (draft) => mutation(draft, ...restArguments));
   };
 
   const store: Store<TState, TMutations, TActions> = {
@@ -163,7 +187,7 @@ export function createStore<TState, TFreezeInitialState extends boolean, TMutati
       return currentState;
     },
     update(recipe) {
-      currentState = produce(currentState, recipe);
+      currentState = produceAndParse(currentState, recipe);
 
       return notify();
     },
@@ -179,7 +203,7 @@ export function createStore<TState, TFreezeInitialState extends boolean, TMutati
       };
     },
     mutation(name, ...restArguments) {
-      mutation(name, ...restArguments);
+      currentState = mutation(currentState, name, ...restArguments);
 
       return notify();
     },
@@ -190,7 +214,11 @@ export function createStore<TState, TFreezeInitialState extends boolean, TMutati
         throw new Error(`Undefined action: ${String(name)}`);
       }
 
-      action(mutation, ...restArguments);
+      let temporaryState = currentState;
+
+      action((name, ...rest) => (temporaryState = mutation(temporaryState, name, ...rest)), ...restArguments);
+
+      currentState = temporaryState;
 
       return notify();
     },
