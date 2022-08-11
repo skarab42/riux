@@ -116,6 +116,10 @@ export interface Store<TState, TMutations, TActions> {
   action: ActionFunction<TState, TActions>;
 }
 
+export type InferState<TType> = TType extends Store<infer TState, unknown, unknown> ? TState : never;
+export type InferMutations<TType> = TType extends Store<unknown, infer TMutations, unknown> ? TMutations : never;
+export type InferActions<TType> = TType extends Store<unknown, unknown, infer TActions> ? TActions : never;
+
 export function isObject(value: unknown): value is object {
   return value !== null && typeof value === 'object';
 }
