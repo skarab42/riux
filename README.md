@@ -232,20 +232,24 @@ store.mutation('setName', 'na'); // TS ERROR + RUNTIME ZodError: String must con
 
 > The Example above is with [Zod](https://github.com/colinhacks/zod), but it can work with any library that exposes a function/method with the right signature, like [Superstruct](https://github.com/ianstormtaylor/superstruct), [Yup](https://github.com/jquense/yup), [tson](https://github.com/skarab42/tson) and more...
 
-Ok that's all for now, but if you think something is missing you can open an [issue](https://github.com/skarab42/store/issues) or even better make a [pull request](https://github.com/skarab42/store/pulls).
+Need more?
 
-### Get initial and current state
+### Type inference
+
+You can extract the TypeScript types of any store with `InferState`, `InferMutations` or `InferActions`.
 
 ```ts
-store.initial(); // 42
-store.current(); // 42
+const store = createStore(42, {
+  mutations: {
+    add: (state, value: number) => state + value,
+  },
+});
 
-store.mutation('reset'); // 0
-store.mutation('increment'); // 1
-
-store.initial(); // 42
-store.current(); // 1
+type Store = InferState<typeof store>; // number
+type StoreMutations = InferMutations<typeof store>; // { add: (state: number, value: number) => number; }
 ```
+
+Ok that's all for now, but if you think something is missing you can open an [issue](https://github.com/skarab42/store/issues) or even better make a [pull request](https://github.com/skarab42/store/pulls).
 
 ---
 
