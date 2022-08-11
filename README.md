@@ -106,7 +106,8 @@ store.subscribe((counter) => {
   console.log(counter);
 });
 
-store.action('reset'); // 0
+store.mutation('reset'); // 0
+
 store.action('incrementTwice'); // 2
 store.action('incrementTwice'); // 4
 store.action('addArray', [5, 8, 10, 15]); // 42
