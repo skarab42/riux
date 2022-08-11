@@ -1,7 +1,7 @@
 {
   "name": "@skarab/store",
   "version": "0.0.0-development",
-  "description": "📦 Fully typed and immutable store made on top of Immer with mutation, action, subscription and more!",
+  "description": "📦 Fully typed and immutable store made on top of Immer with mutation, action, subscription and validation!",
   "author": {
     "name": "skarab42",
     "email": "skarab@bluewin.ch"

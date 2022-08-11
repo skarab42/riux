@@ -1,6 +1,6 @@
 # @skarab/store
 
-📦 Fully typed and [immutable](#immutability) store made on top of [Immer](https://immerjs.github.io/immer/) with [mutation](#add-some-mutations), [action](#add-some-actions), [subscription](#add-some-subscriptions) and more!
+📦 Fully typed and [immutable](#immutability) store made on top of [Immer](https://immerjs.github.io/immer/) with [mutation](#add-some-mutations), [action](#add-some-actions), [subscription](#add-some-subscriptions) and [validation](#validation-with-zod-superstruct-yup-tson)!
 
 ## Installation
 
@@ -50,7 +50,9 @@ store.mutation('add', 40); // 42
 store.mutation('reset'); // 0
 ```
 
-As you can see the code is a bit longer but better structured. All is centralized in the store (which allows for example to have autocompletions in the IDE). But this is not the only advantage and you will see it later with the [actions](#add-some-actions). Ok nice... But what next?
+As you can see the code is a bit longer but better structured. All is centralized in the store (which allows for example to have autocompletions in the IDE). But this is not the only advantage and you will see it later with the [actions](#add-some-actions).
+
+Ok nice... But what next?
 
 ### Add some subscriptions
 
@@ -148,7 +150,7 @@ currentState.life = 1337; // TS ERROR + RUNTIME ERROR: Cannot assign to 'life' b
 
 Ok that rocks, one source of truth I like that! But I want more!
 
-### Validation
+### Validation with custom parser
 
 By default no data validation is done at runtime, only TypeScript protects you from input type errors at build time or in the IDE.
 
@@ -191,6 +193,46 @@ store.mutation('set', undefined);
 store.mutation('set', 'or string');
 store.mutation('set', 42); // TS ERROR + RUNTIME ERROR: expected 'string' got 'number'
 ```
+
+This is starting to be very interesting, but I'm sure we can do better! Right?
+
+### Validation with Zod, Superstruct, Yup, tson, ...
+
+[Zod](https://github.com/colinhacks/zod) is a TypeScript-first schema validation with static type inference which can be used to validate the state of the store on each mutation. This is very powerful when it comes to parse complex data structures.
+
+```ts
+const schema = z.object({
+  name: z.string().min(3),
+  life: z.number(),
+});
+
+const store = createStore(
+  { name: 'nyan', life: 42 },
+  {
+    parse: (state) => schema.parse(state),
+    mutations: {
+      setName(draft, name: string) {
+        draft.name = name;
+      },
+      setLife(draft, life: number) {
+        draft.life = life;
+      },
+    },
+  },
+);
+
+store.current(); // { readonly name: string; readonly life: number }
+
+store.mutation('setName', 'bob'); // { name: 'bob', life: 42 }
+store.mutation('setLife', 1337); // { name: 'bob', life: 1337 }
+
+store.mutation('setLife', [true]); // TS ERROR + RUNTIME ZodError: Expected number, received array
+store.mutation('setName', 'na'); // TS ERROR + RUNTIME ZodError: String must contain at least 3 character(s)
+```
+
+> The Example above is with [Zod](https://github.com/colinhacks/zod), but it can work with any library that exposes a function/method with the right signature, like [Superstruct](https://github.com/ianstormtaylor/superstruct), [Yup](https://github.com/jquense/yup), [tson](https://github.com/skarab42/tson) and more...
+
+Ok that's all for now, but if you think something is missing you can open an [issue](https://github.com/skarab42/store/issues) or even better make a [pull request](https://github.com/skarab42/store/pulls).
 
 ### Get initial and current state
 
