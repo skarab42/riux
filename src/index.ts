@@ -231,4 +231,5 @@ export function createStore<TState, TFreezeInitialState extends boolean, TMutati
   return store;
 }
 
-export const store = createStore;
+export const riux = createStore;
+export default createStore;

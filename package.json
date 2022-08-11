@@ -1,5 +1,5 @@
 {
-  "name": "@skarab/store",
+  "name": "riux",
   "version": "0.0.0-development",
   "description": "📦 Fully typed and immutable store made on top of Immer with mutation, action, subscription and validation!",
   "author": {
@@ -8,10 +8,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/skarab42/store.git"
+    "url": "https://github.com/skarab42/riux.git"
   },
-  "homepage": "https://github.com/skarab42/store",
-  "bugs": "https://github.com/skarab42/store/issues",
+  "homepage": "https://github.com/skarab42/riux",
+  "bugs": "https://github.com/skarab42/riux/issues",
   "funding": "https://github.com/sponsors/skarab42",
   "license": "MIT",
   "type": "module",
@@ -62,6 +62,7 @@
     "store",
     "state",
     "immer",
+    "zod",
     "redux",
     "typed",
     "mutation",

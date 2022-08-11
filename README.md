@@ -1,11 +1,11 @@
-# @skarab/store
+![riux-logo](https://user-images.githubusercontent.com/62928763/184168494-85d90d39-66d1-4f5a-a484-d4ae464e8495.svg)
 
-📦 Fully typed and [immutable](#immutability) store made on top of [Immer](https://immerjs.github.io/immer/) with [mutation](#add-some-mutations), [action](#add-some-actions), [subscription](#add-some-subscriptions) and [validation](#validation-with-zod-superstruct-yup-tson)!
+# Riux is a fully typed and [immutable](#immutability) store made on top of [Immer](https://immerjs.github.io/immer/) with [mutation](#add-some-mutations), [action](#add-some-actions), [subscription](#add-some-subscriptions) and [validation](#validation-with-zod-superstruct-yup-tson)!
 
 ## Installation
 
 ```bash
-pnpm add @skarab/store
+pnpm add riux
 ```
 
 ## Usage
@@ -13,9 +13,9 @@ pnpm add @skarab/store
 ### Basic usage
 
 ```ts
-import { createStore } from '@skarab/store';
+import riux from 'riux';
 
-const store = createStore(42);
+const store = riux(42);
 
 const reset = () => store.update(() => 0);
 // 'draft' is automatically typed as 'number'
@@ -35,7 +35,7 @@ Ok, that's cool, but that's more or less what [Immer](https://immerjs.github.io/
 This is the same example as above but using mutations.
 
 ```ts
-const store = createStore(42, {
+const store = riux(42, {
   // 'draft' is automatically typed as 'number' in each mutation
   mutations: {
     reset: () => 0,
@@ -61,7 +61,7 @@ You can register a function that will be called when the state is updated.
 > An update is raised each time the `update`, `mutation` or `action` function is called.
 
 ```ts
-const store = createStore({ counter: 0 });
+const store = riux({ counter: 0 });
 
 // 'state' is automatically typed as '{ counter: number }'
 const subscription = store.subscribe((state) => {
@@ -81,7 +81,7 @@ Well, that's a minimum, isn't it? What else is there?
 The actions allow you to compose mutations that do not raise an event before the end of the action.
 
 ```ts
-const store = createStore(42, {
+const store = riux(42, {
   // 'draft' is automatically typed as 'number' in each mutation
   mutations: {
     reset: () => 0,
@@ -124,7 +124,7 @@ By default when you create a store, it becomes immutable as well as its source (
 
 ```ts
 const source = { life: 42 };
-const store = createStore(source);
+const store = riux(source);
 
 source.life = 1337; // RUNTIME ERROR: Cannot assign to read only property 'life' of object...
 
@@ -140,7 +140,7 @@ If you wish to avoid the first error you can set the `freezeInitialState` option
 > Note that the state retrieved via `store.initial()` remains unchanged and immutable. Only the source outside the store will not be frozen.
 
 ```ts
-const store = createStore(source, { freezeInitialState: false });
+const store = riux(source, { freezeInitialState: false });
 
 source.life = 1337; // NO ERROR!
 // ...
@@ -157,7 +157,7 @@ By default no data validation is done at runtime, only TypeScript protects you f
 If you want to validate your data at runtime, you must provide a `parse` function that validates/casts the state before finalizing the draft and either returns a strongly typed value (if valid) or throws an error (if invalid).
 
 ```ts
-const store = createStore(0, {
+const store = riux(0, {
   parse: (state) => {
     if (typeof state === 'number') return state;
     throw new Error(`expected 'number' got '${typeof state}'`);
@@ -175,7 +175,7 @@ store.mutation('add', 'prout'); // TS ERROR + RUNTIME ERROR: expected 'number' g
 Another advantage of this method is the ability to specify multiple types (union). Imagine you have a single value that can be undefined or a string. How do you do this?
 
 ```ts
-const store = createStore(undefined, {
+const store = riux(undefined, {
   parse: (state) => {
     if (state === undefined || typeof state === 'string') return state;
     throw new Error(`expected 'number' got '${typeof state}'`);
@@ -206,7 +206,7 @@ const schema = z.object({
   life: z.number(),
 });
 
-const store = createStore(
+const store = riux(
   { name: 'nyan', life: 42 },
   {
     parse: (state) => schema.parse(state),
@@ -239,7 +239,9 @@ Need more?
 You can extract the TypeScript types of any store with `InferState`, `InferMutations` or `InferActions`.
 
 ```ts
-const store = createStore(42, {
+import riux, { type InferState, type InferMutations } from 'riux';
+
+const store = riux(42, {
   mutations: {
     add: (state, value: number) => state + value,
   },
@@ -249,7 +251,7 @@ type Store = InferState<typeof store>; // number
 type StoreMutations = InferMutations<typeof store>; // { add: (state: number, value: number) => number; }
 ```
 
-Ok that's all for now, but if you think something is missing you can open an [issue](https://github.com/skarab42/store/issues) or even better make a [pull request](https://github.com/skarab42/store/pulls).
+Ok that's all for now, but if you think something is missing you can open an [issue](https://github.com/skarab42/riux/issues) or even better make a [pull request](https://github.com/skarab42/riux/pulls).
 
 ---
 
