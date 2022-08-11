@@ -18,10 +18,8 @@ import { createStore } from '@skarab/store';
 const store = createStore(42);
 
 const reset = () => store.update(() => 0);
-
 // 'draft' is automatically typed as 'number'
 const increment = () => store.update((draft) => draft + 1);
-
 const add = (value: number) => store.update((draft) => draft + value);
 
 increment(); // 1
@@ -52,7 +50,7 @@ store.mutation('add', 40); // 42
 store.mutation('reset'); // 0
 ```
 
-As you can see the code is clearer and more structured. But this is not the only advantage and you will see it later with the [actions](#add-some-actions). Ok nice... But what next?
+As you can see the code is a bit longer but better structured. All is centralized in the store (which allows for example to have autocompletions in the IDE). But this is not the only advantage and you will see it later with the [actions](#add-some-actions). Ok nice... But what next?
 
 ### Add some subscriptions
 

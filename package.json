@@ -62,6 +62,9 @@
     "state",
     "immer",
     "redux",
-    "typed"
+    "typed",
+    "mutation",
+    "action",
+    "subscription"
   ]
 }
