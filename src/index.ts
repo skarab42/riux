@@ -144,13 +144,13 @@ export function createStore<TState, TFreezeInitialState extends boolean, TMutati
   }
 
   function produceAndParse(state: TState | Immutable<TState>, recipe: Recipe<TState>): Immutable<TState> {
-    return produce(state as Immutable<TState>, (draft) => {
-      if (!parse) {
-        return recipe(draft);
-      }
+    let newState = produce(state, recipe);
 
-      return parse(recipe(draft)) as RecipeReturn<TState>;
-    });
+    if (parse) {
+      newState = parse(newState);
+    }
+
+    return newState as Immutable<TState>;
   }
 
   let currentState = produceAndParse(initialState, (draft) => draft);
