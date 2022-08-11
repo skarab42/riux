@@ -14,6 +14,7 @@ specifiers:
   typescript: ^4.7.4
   vite-plugin-vitest-typescript-assert: ^1.1.4
   vitest: ^0.20.2
+  zod: ^3.18.0
 
 dependencies:
   immer: 9.0.15
@@ -31,6 +32,7 @@ devDependencies:
   typescript: 4.7.4
   vite-plugin-vitest-typescript-assert: 1.1.4_tn6xrn7iugv43xzw2kqptwzfby
   vitest: 0.20.3
+  zod: 3.18.0
 
 packages:
 
@@ -4340,4 +4342,8 @@ packages:
   /yocto-queue/0.1.0:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
+    dev: true
+
+  /zod/3.18.0:
+    resolution: {integrity: sha512-gwTm8RfUCe8l9rDwN5r2A17DkAa8Ez4Yl4yXqc5VqeGaXaJahzYYXbTwvhroZi0SNBqTwh/bKm2N0mpCzuw4bA==}
     dev: true

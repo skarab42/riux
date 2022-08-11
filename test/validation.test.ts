@@ -5,6 +5,8 @@ import { createStore } from '../src/index.js';
 import { parseStringOrNumber } from './fixtures/util.js';
 import { createStoreWithValidation } from './fixtures/create-store.js';
 
+import { z } from 'zod';
+
 it('should error if parse option is not a function', () => {
   expect(() => {
     expectType(createStore(0, { parse: 'prout' })).toThrowError(2322);
@@ -68,4 +70,39 @@ it('should validate store action', () => {
   }).toThrow(`expected 'string|number' got 'NaN'`);
 
   expect(store.current()).toBe(1337);
+});
+
+it('should validate store with Zod', () => {
+  const schema = z.object({
+    name: z.string().min(3),
+    life: z.number(),
+  });
+
+  const store = createStore(
+    { name: 'nyan', life: 42 },
+    {
+      parse: (state) => schema.parse(state),
+      mutations: {
+        setName(draft, name: string) {
+          draft.name = name;
+        },
+        setLife(draft, life: number) {
+          draft.life = life;
+        },
+      },
+    },
+  );
+
+  expectType(store.current()).identicalTo<{ readonly name: string; readonly life: number }>();
+
+  expect(store.mutation('setName', 'bob')).toStrictEqual({ name: 'bob', life: 42 });
+  expect(store.mutation('setLife', 1337)).toStrictEqual({ name: 'bob', life: 1337 });
+
+  expect(() => {
+    expectType(store.mutation('setLife', [true])).toThrowError(2345);
+  }).toThrow(`Expected number, received array`);
+
+  expect(() => {
+    store.mutation('setName', 'na');
+  }).toThrow(`String must contain at least 3 character(s)`);
 });
