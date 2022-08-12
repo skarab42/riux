@@ -14,8 +14,8 @@
   <!-- <a href="https://codecov.io/gh/skarab42/riux"><img src="https://codecov.io/gh/skarab42/riux/branch/main/graph/badge.svg?token=4PSFJBVAFB" alt="codecov"></a> -->
   <img src="https://img.shields.io/github/languages/code-size/skarab42/riux?color=success&style=flat" alt="GitHub code size in bytes">
   <img src="https://img.shields.io/github/license/skarab42/riux?color=success" alt="GitHub">
-  <a href="#"><img src="https://img.shields.io/github/sponsors/skarab42?color=ff69b4&label=%E2%9D%A4%20sponsors%20" alt="GitHub Sponsors"></a>
-  <a href="#"><img src="https://img.shields.io/twitch/status/skarab42?style=social" alt="Twitch Status"></a>
+  <a href="https://github.com/sponsors/skarab42"><img src="https://img.shields.io/github/sponsors/skarab42?color=ff69b4&label=%E2%9D%A4%20sponsors%20" alt="GitHub Sponsors"></a>
+  <a href="https://www.twitch.tv/skarab42"><img src="https://img.shields.io/twitch/status/skarab42?style=social" alt="Twitch Status"></a>
 </div>
 
 <br />
