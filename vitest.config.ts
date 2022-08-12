@@ -3,4 +3,9 @@ import { vitestTypescriptAssertPlugin } from 'vite-plugin-vitest-typescript-asse
 
 export default defineConfig({
   plugins: [vitestTypescriptAssertPlugin()],
+  test: {
+    coverage: {
+      reporter: ['text', 'lcov'],
+    },
+  },
 });

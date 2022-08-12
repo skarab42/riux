@@ -30,7 +30,7 @@
     "lint": "eslint --max-warnings=0 .",
     "format": "prettier --check .",
     "check-lint-format": "pnpm check && pnpm lint && pnpm format",
-    "test": "pnpm check-lint-format && pnpm vitest run",
+    "test": "pnpm check-lint-format && pnpm vitest run --coverage",
     "prepare": "npx simple-git-hooks",
     "release": "semantic-release --branches main"
   },
@@ -42,6 +42,7 @@
     "@skarab/prettier-config": "^1.2.2",
     "@skarab/typescript-config": "^1.1.0",
     "@types/node": "^18.6.3",
+    "c8": "^7.12.0",
     "eslint": "^8.20.0",
     "lint-staged": "^13.0.3",
     "prettier": "^2.7.1",

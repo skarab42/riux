@@ -1,4 +1,5 @@
 node_modules
+coverage
 lib
 
 # remove or comment the following line when you want to publish

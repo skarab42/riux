@@ -26,6 +26,14 @@ jobs:
       - run: pnpm install
       - run: pnpm build
       - run: pnpm test
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./coverage/lcov.info
+          fail_ci_if_error: true
+          verbose: true
+
   release:
     needs: [test]
     if: ${{ github.ref == 'refs/heads/main' }}
