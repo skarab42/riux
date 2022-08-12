@@ -32,6 +32,14 @@ it('should create store with mutations', () => {
   expect(collectValue).toHaveBeenCalledTimes(expectedValues.length);
 });
 
+it('should error on missing mutation', () => {
+  const store = createStoreWithMutations();
+
+  expect(() => {
+    expectType(store.mutation('prout')).toThrowError(2345);
+  }).toThrow('Undefined mutation: prout');
+});
+
 it('should error on missing argument', () => {
   const store = createStoreWithMutations();
 
