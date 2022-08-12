@@ -33,6 +33,7 @@
   - [Immutability](#immutability)
   - [Validation with custom parser](#validation-with-custom-parser)
   - [Validation with Zod, Superstruct, Yup, tson, ...](#validation-with-zod-superstruct-yup-tson-)
+- [Scaling](#scaling)
 - [Type inference](#type-inference)
 
 </details>
@@ -272,6 +273,88 @@ store.mutation('setName', 'na'); // TS ERROR + RUNTIME ZodError: String must con
 > The Example above is with [Zod](https://github.com/colinhacks/zod), but it can work with any library that exposes a function/method with the right signature, like [Superstruct](https://github.com/ianstormtaylor/superstruct), [Yup](https://github.com/jquense/yup), [tson](https://github.com/skarab42/tson) and more...
 
 Need more?
+
+# Scaling
+
+As your store grows you will probably want to split your code into several files. Here's how to do it.
+
+```ts
+// initial-state.ts
+
+export const initialState = {
+  name: 'nyan',
+  life: 42,
+  items: [
+    { id: 1, name: 'item-1', rare: true },
+    { id: 2, name: 'item-2', rare: false },
+    { id: 3, name: 'item-3', rare: false },
+  ],
+};
+
+export type State = typeof initialState;
+export type Item = State['items'][number];
+```
+
+```ts
+// mutations.ts
+
+import { createMutation, createMutations } from 'riux';
+import { initialState, type Item } from './initial-state.js';
+
+// This function could be in another file, for example 'mutations/add-item.ts.
+const addItem = createMutation(initialState, (draft, item: Item) => {
+  draft.items.push(item);
+});
+
+export const mutations = createMutations(initialState, {
+  setName: (draft, name: string) => {
+    draft.name = name;
+  },
+  setLife(draft, life: number) {
+    draft.life = life;
+  },
+  addItem,
+});
+```
+
+```ts
+// actions/add-items.ts
+
+import { createAction } from 'riux';
+import { initialState, type Item } from '../initial-state.js';
+import { mutations } from '../mutations.js';
+
+export const addItems = createAction(initialState, mutations, (mutation, items: Item[]) => {
+  for (const item of items) {
+    mutation('addItem', item);
+  }
+});
+```
+
+```ts
+// actions.ts
+
+import { createAction, createActions } from 'riux';
+import { initialState, type Item } from './initial-state.js';
+import { mutations } from './mutations.js';
+import { addItems } from './actions/add-items.js';
+
+export const actions = createActions(initialState, mutations, {
+  setName(mutation, name: string) {
+    mutation('setName', name);
+  },
+  addItems,
+});
+```
+
+```ts
+// store.ts
+import { initialState, type Item } from './initial-state.js';
+import { mutations } from './mutations.js';
+import { actions } from './actions.js';
+
+export const store = createStore(initialState, { mutations, actions });
+```
 
 # Type inference
 
