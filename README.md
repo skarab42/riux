@@ -248,8 +248,8 @@ const store = riux(42, {
   },
 });
 
-type Store = InferState<typeof store>; // number
-type StoreMutations = InferMutations<typeof store>; // { add: (state: number, value: number) => number; }
+type State = InferState<typeof store>; // number
+type Mutations = InferMutations<typeof store>; // { add: (state: number, value: number) => number; }
 ```
 
 Ok that's all for now, but if you think something is missing you can open an [issue](https://github.com/skarab42/riux/issues) or even better make a [pull request](https://github.com/skarab42/riux/pulls).
