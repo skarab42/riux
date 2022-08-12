@@ -29,6 +29,14 @@ it('should create store with actions', () => {
   expect(collectValue).toHaveBeenCalledTimes(expectedValues.length);
 });
 
+it('should error on missing action', () => {
+  const store = createStoreWithActions();
+
+  expect(() => {
+    expectType(store.action('prout')).toThrowError(2345);
+  }).toThrow('Undefined action: prout');
+});
+
 it('should error on missing argument', () => {
   const store = createStoreWithActions();
 
