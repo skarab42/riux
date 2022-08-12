@@ -1,8 +1,12 @@
 import { expect, it } from 'vitest';
 import { expectType } from 'vite-plugin-vitest-typescript-assert/tssert';
 
-import { createStore } from '../src/index.js';
+import { createStore, riux } from '../src/index.js';
 import { Clock, ImmerableClock } from './fixtures/clock.js';
+
+it('should export both createStore and riux', () => {
+  expect(createStore).toStrictEqual(riux);
+});
 
 it('should create store from number', () => {
   const value = 42;
