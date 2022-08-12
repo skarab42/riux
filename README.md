@@ -3,11 +3,26 @@
 </div>
 
 <h1 align="center">
-Riux is a fully typed and <a href="#immutability">immutable</a> store made on top of <a href="https://immerjs.github.io/immer/">Immer</a> with <a href="#add-some-mutations">mutation</a>, <a href="#add-some-actions">action</a>, <a href="#add-some-subscriptions">subscription</a> and <a href="#validation-with-zod-superstruct-yup-tson">validation</a>!
+  Riux is a fully typed and <a href="#immutability">immutable</a> store made on top of <a href="https://immerjs.github.io/immer/">Immer</a> with <a href="#add-some-mutations">mutation</a>, <a href="#add-some-actions">action</a>, <a href="#add-some-subscriptions">subscription</a> and <a href="#validation-with-zod-superstruct-yup-tson">validation</a>!
+  <br />
 </h1>
 
-<details style="font-size:1.2em;background-color:rgba(0,0,0,0.2);border-radius:8px;padding:4px;cursor:pointer">
-<summary align="center">Table of contents 🎯</summary>
+<br />
+
+<div align="center">
+  <a href="https://github.com/skarab42/riux/actions/workflows/test-release.yaml"><img src="https://github.com/skarab42/riux/actions/workflows/test-release.yaml/badge.svg" alt="Test and Lint"></a>
+  <!-- <a href="https://codecov.io/gh/skarab42/riux"><img src="https://codecov.io/gh/skarab42/riux/branch/main/graph/badge.svg?token=4PSFJBVAFB" alt="codecov"></a> -->
+  <img src="https://img.shields.io/github/languages/code-size/skarab42/riux?color=success&style=flat" alt="GitHub code size in bytes">
+  <img src="https://img.shields.io/github/license/skarab42/riux?color=success" alt="GitHub">
+  <a href="#"><img src="https://img.shields.io/github/sponsors/skarab42?color=ff69b4&label=%E2%9D%A4%20sponsors%20" alt="GitHub Sponsors"></a>
+  <a href="#"><img src="https://img.shields.io/twitch/status/skarab42?style=social" alt="Twitch Status"></a>
+</div>
+
+<br />
+<hr />
+
+<details>
+<summary align="center">Table of contents 👀</summary>
 
 - [Installation](#installation)
 - [Usage](#usage)
@@ -21,6 +36,9 @@ Riux is a fully typed and <a href="#immutability">immutable</a> store made on to
 - [Type inference](#type-inference)
 
 </details>
+
+<hr />
+<br />
 
 # Installation
 
