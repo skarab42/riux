@@ -1,14 +1,34 @@
-![riux-logo](https://user-images.githubusercontent.com/62928763/184168494-85d90d39-66d1-4f5a-a484-d4ae464e8495.svg)
+<div align="center">
+  <img src="https://user-images.githubusercontent.com/62928763/184168494-85d90d39-66d1-4f5a-a484-d4ae464e8495.svg" alt="Riux logo" />
+</div>
 
-# Riux is a fully typed and [immutable](#immutability) store made on top of [Immer](https://immerjs.github.io/immer/) with [mutation](#add-some-mutations), [action](#add-some-actions), [subscription](#add-some-subscriptions) and [validation](#validation-with-zod-superstruct-yup-tson)!
+<h1 align="center">
+Riux is a fully typed and <a href="#immutability">immutable</a> store made on top of <a href="https://immerjs.github.io/immer/">Immer</a> with <a href="#add-some-mutations">mutation</a>, <a href="#add-some-actions">action</a>, <a href="#add-some-subscriptions">subscription</a> and <a href="#validation-with-zod-superstruct-yup-tson">validation</a>!
+</h1>
 
-## Installation
+<details style="font-size:1.2em;background-color:rgba(0,0,0,0.2);border-radius:8px;padding:4px;cursor:pointer">
+<summary align="center">Table of contents 🎯</summary>
+
+- [Installation](#installation)
+- [Usage](#usage)
+  - [Basic usage](#basic-usage)
+  - [Add some mutations](#add-some-mutations)
+  - [Add some subscriptions](#add-some-subscriptions)
+  - [Add some actions](#add-some-actions)
+  - [Immutability](#immutability)
+  - [Validation with custom parser](#validation-with-custom-parser)
+  - [Validation with Zod, Superstruct, Yup, tson, ...](#validation-with-zod-superstruct-yup-tson-)
+- [Type inference](#type-inference)
+
+</details>
+
+# Installation
 
 ```bash
 pnpm add riux
 ```
 
-## Usage
+# Usage
 
 ### Basic usage
 
@@ -235,7 +255,7 @@ store.mutation('setName', 'na'); // TS ERROR + RUNTIME ZodError: String must con
 
 Need more?
 
-### Type inference
+# Type inference
 
 You can extract the TypeScript types of any store with `InferState`, `InferMutations` or `InferActions`.
 
