@@ -231,5 +231,39 @@ export function createStore<TState, TFreezeInitialState extends boolean, TMutati
   return store;
 }
 
+/** This function does nothing more than typing your mutation. */
+export function createMutation<TState, TMutation extends Mutation<TState>>(
+  _initialState: TState,
+  mutation: TMutation,
+): TMutation {
+  return mutation;
+}
+
+/** This function does nothing more than typing your mutations. */
+export function createMutations<TState, TMutations extends Mutations<TState>>(
+  _initialState: TState,
+  mutations: TMutations,
+): TMutations {
+  return mutations;
+}
+
+/** This function does nothing more than typing your mutation. */
+export function createAction<TState, TMutations, TAction extends Action<TState, TMutations>>(
+  _initialState: TState,
+  _mutations: TMutations,
+  action: TAction,
+): TAction {
+  return action;
+}
+
+/** This function does nothing more than typing your actions. */
+export function createActions<TState, TMutations, TActions extends Actions<TState, TMutations>>(
+  _initialState: TState,
+  _mutations: TMutations,
+  actions: TActions,
+): TActions {
+  return actions;
+}
+
 export const riux = createStore;
 export default createStore;
