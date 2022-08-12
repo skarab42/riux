@@ -11,7 +11,7 @@
 
 <div align="center">
   <a href="https://github.com/skarab42/riux/actions/workflows/test-release.yaml"><img src="https://github.com/skarab42/riux/actions/workflows/test-release.yaml/badge.svg" alt="Test and Lint"></a>
-  <!-- <a href="https://codecov.io/gh/skarab42/riux"><img src="https://codecov.io/gh/skarab42/riux/branch/main/graph/badge.svg?token=4PSFJBVAFB" alt="codecov"></a> -->
+  <a href="https://codecov.io/gh/skarab42/riux"><img src="https://codecov.io/gh/skarab42/riux/branch/main/graph/badge.svg?token=YVUTZ0C1GR"/></a>
   <img src="https://img.shields.io/github/languages/code-size/skarab42/riux?color=success&style=flat" alt="GitHub code size in bytes">
   <img src="https://img.shields.io/github/license/skarab42/riux?color=success" alt="GitHub">
   <a href="https://github.com/sponsors/skarab42"><img src="https://img.shields.io/github/sponsors/skarab42?color=ff69b4&label=%E2%9D%A4%20sponsors%20" alt="GitHub Sponsors"></a>
